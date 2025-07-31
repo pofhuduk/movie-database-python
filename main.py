@@ -52,17 +52,15 @@ def run_movie_search(api:str, url:str):
     if (len(results) == 1):
         index = 0
     elif (len(results) == 0):
-        print("No results found.")
-        return 0
+        return "No results found."
     else:
         text = ''
         for index,obj in enumerate(results[0:10]):
             text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
         text += '[0] Exit\n'
-        choice = input(text + 'Choose:')
+        choice = input(text + 'Choose: ')
         
         if (choice == '0'):
-            print('Goodbye!')
             return 'exit'
         index = int(choice) - 1
         
@@ -86,8 +84,7 @@ def run_tv_search(api:str, url:str):
     if (len(results) == 1):
         index = 0
     elif (len(results) == 0):
-        print("No results found.")
-        return 0
+        return "No results found."
     else:
         text = ''
         for index,obj in enumerate(results[0:10]):
@@ -96,7 +93,6 @@ def run_tv_search(api:str, url:str):
         choice = input(text + 'Choose:')
         
         if (choice == '0'):
-            print('Goodbye!')
             return 'exit'
         index = int(choice) - 1
         
@@ -114,15 +110,15 @@ def run_tv_search(api:str, url:str):
 
 def main(api:str, mov_url:str, tv_url:str):
     subprocess.call('clear')
-    x = input('1 - Movie Search | 2 - TV Show Search')
+    x = input('1 - Movie Search | 2 - TV Show Search ')
     if (x == '1'):
         result = run_movie_search(api=api, url=mov_url)
     elif (x == '2'):
         result = run_tv_search(api=api, url=tv_url)
     else:
-        result = None
+        return 'exit'
 
-    print(result)
+    return result
 
 load_dotenv()
 API = os.getenv('API')
@@ -136,8 +132,12 @@ TV_URL = 'https://api.themoviedb.org/3/search/tv'
 
 while True:
     try:
-        main(api=API, mov_url=MOVIE_URL, tv_url=TV_URL)
+        result = main(api=API, mov_url=MOVIE_URL, tv_url=TV_URL)
+        if (result == 'exit'):
+            print('Goodbye!')
+            break
+        else:
+            print(result)
     except (IndexError, ValueError):
         print("Invalid input. Please enter a number from the list.")
     input('Press ENTER to continue...')
-
