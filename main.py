@@ -7,27 +7,34 @@ def search_movie(url:str, api:str, movie_name:str):
             'query': movie_name,
             'api_key': api
             }
-    r = requests.get(url, params=params)
-    print(r.json())
+    r = requests.get(url, params=params).json()
+    results = r['results']
+    
+    if (len(results) == 1):
+        return False
+    text= ''
+    for index, obj in enumerate(results[0:7]):
+        text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+     
+    return text
 
-'''
-def get_movie(url:str, api:str , movie_id:str):
+def get_movie(url:str, api:str , movie_name:str, index:int):
     params = {
             'query': movie_name,
             'api_key': api
             }
     r = requests.get(url, params=params).json()
-    full_data = r['results'][0]
+    full_data = r['results']
+    movie = full_data[index]
 
-    title = full_data['title']
-    overview = full_data['overview']
-    release_date = full_data['release_date']
-    vote = full_data['vote_average']
+    title = movie['title']
+    overview = movie['overview']
+    release_date = movie['release_date']
+    vote = movie['vote_average']
     vote_formatted = str(vote)[0:3]
     
-    return title, overview, release_date, vote_formatted
-'''
-
+    return title, release_date, vote_formatted, overview
+    
 load_dotenv()
 API = os.getenv('API')
 
@@ -37,33 +44,31 @@ if not API:
 
 URL = 'https://api.themoviedb.org/3/search/movie'
 
-movie_name = input('Movie Name:')
+def main(api:str, url:str):
+    movie_name = input('Movie Name:')
+    
+    results = search_movie(url=url, movie_name=movie_name, api=api)
+    if not results:
+        index = 0
+    else:
+        choice = input(results)
+        index = int(choice) - 1
 
-search_movie(url=URL, movie_name=movie_name, api=API)
+    title, release_date, vote, overview = get_movie(
+            url=url,
+            movie_name=movie_name,
+            api=api,
+            index=index)
 
+    print(f'''
+        =========================
+               MOVIE SEARCH
+        =========================
+        Movie Name: {title}
+        Release Date: {release_date}
+        iMDB: {vote}
+        Overview:
+        {overview}''')
 
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-title, overview, release_date, vote = search_movie(url=URL, api=API, movie_name=movie_name)
-
-print(f'''
-    =========================
-           MOVIE SEARCH
-    =========================
-    Movie Name: {title}
-    Release Date: {release_date}
-    iMDB: {vote}
-    Overview:
-    {overview}''')
-"""
+while True:
+    main(api=API, url=URL)
