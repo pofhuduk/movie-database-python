@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+import subprocess
 
 def search_movie(url:str, api:str, movie_name:str):
     params = {
@@ -33,6 +34,7 @@ if not API:
 URL = 'https://api.themoviedb.org/3/search/movie'
 
 def main(api:str, url:str):
+    subprocess.call('clear')
     movie_name = input('Movie Name:')
     
     results = search_movie(url=url, movie_name=movie_name, api=api)
