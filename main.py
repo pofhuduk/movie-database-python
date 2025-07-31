@@ -10,22 +10,10 @@ def search_movie(url:str, api:str, movie_name:str):
     r = requests.get(url, params=params).json()
     results = r['results']
     
-    if (len(results) == 1):
-        return False
-    text= ''
-    for index, obj in enumerate(results[0:7]):
-        text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
-     
-    return text
+    return results
 
-def get_movie(url:str, api:str , movie_name:str, index:int):
-    params = {
-            'query': movie_name,
-            'api_key': api
-            }
-    r = requests.get(url, params=params).json()
-    full_data = r['results']
-    movie = full_data[index]
+def get_movie(json:list, index:int):
+    movie = json[index]
 
     title = movie['title']
     overview = movie['overview']
@@ -48,17 +36,19 @@ def main(api:str, url:str):
     movie_name = input('Movie Name:')
     
     results = search_movie(url=url, movie_name=movie_name, api=api)
-    if not results:
-        index = 0
-    else:
-        choice = input(results)
-        index = int(choice) - 1
 
-    title, release_date, vote, overview = get_movie(
-            url=url,
-            movie_name=movie_name,
-            api=api,
-            index=index)
+    if (len(results) == 1):
+        index = 0
+    elif (len(results) > 1):
+        text = ''
+        for index,obj in enumerate(results[0:10]):
+            text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+        choice = input(text + 'Choose:')
+        index = int(choice) - 1
+    else:
+        index = 0
+
+    title, release_date, vote, overview = get_movie(json=results, index=index)
 
     print(f'''
         =========================
@@ -70,6 +60,4 @@ def main(api:str, url:str):
         Overview:
         {overview}''')
 
-
-while True:
-    main(api=API, url=URL)
+main(api=API, url=URL)
