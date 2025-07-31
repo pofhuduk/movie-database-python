@@ -19,19 +19,10 @@ def get_movie(json:list, index:int):
     title = movie['title']
     overview = movie['overview']
     release_date = movie['release_date']
-    vote = movie['vote_average']
-    vote_formatted = str(vote)[0:3]
+    vote_average = movie['vote_average']
+    vote_formatted = str(vote_average)[0:3]
     
     return title, release_date, vote_formatted, overview
-    
-load_dotenv()
-API = os.getenv('API')
-
-if not API:
-    print('No API keys found.')
-    exit()
-
-URL = 'https://api.themoviedb.org/3/search/movie'
 
 def main(api:str, url:str):
     subprocess.call('clear')
@@ -41,14 +32,15 @@ def main(api:str, url:str):
 
     if (len(results) == 1):
         index = 0
-    elif (len(results) > 1):
+    elif (len(results) == 0):
+        print("No results found.")
+        return 0
+    else:
         text = ''
         for index,obj in enumerate(results[0:10]):
             text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
         choice = input(text + 'Choose:')
         index = int(choice) - 1
-    else:
-        index = 0
 
     title, release_date, vote, overview = get_movie(json=results, index=index)
 
@@ -62,4 +54,19 @@ def main(api:str, url:str):
         Overview:
         {overview}''')
 
-main(api=API, url=URL)
+
+load_dotenv()
+API = os.getenv('API')
+
+if not API:
+    print('No API keys found.')
+    exit()
+
+URL = 'https://api.themoviedb.org/3/search/movie'
+
+while True:
+    try:
+        main(api=API, url=URL)
+    except (IndexError, ValueError):
+        print("Invalid input. Please enter a number from the list.")
+    input('Press ENTER to continue...')
