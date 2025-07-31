@@ -22,7 +22,12 @@ def get_movie(json:list, index:int):
     vote_average = movie['vote_average']
     vote_formatted = str(vote_average)[0:3]
     
-    return title, release_date, vote_formatted, overview
+    return {
+            'title': title,
+            'overview': overview,
+            'release_date': release_date,
+            'average_vote': vote_formatted
+            }
 
 def main(api:str, url:str):
     subprocess.call('clear')
@@ -42,17 +47,17 @@ def main(api:str, url:str):
         choice = input(text + 'Choose:')
         index = int(choice) - 1
 
-    title, release_date, vote, overview = get_movie(json=results, index=index)
+    movie_data = get_movie(json=results, index=index)
 
     print(f'''
         =========================
                MOVIE SEARCH
         =========================
-        Movie Name: {title}
-        Release Date: {release_date}
-        iMDB: {vote}
+        Movie Name: {movie_data['title']}
+        Release Date: {movie_data['release_date']}
+        iMDB: {movie_data['average_vote']}
         Overview:
-        {overview}''')
+        {movie_data['overview']}''')
 
 
 load_dotenv()
