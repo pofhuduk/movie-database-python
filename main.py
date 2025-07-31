@@ -20,7 +20,7 @@ def get_movie(movie_list:list, index:int):
     overview = movie['overview']
     release_date = movie['release_date']
     vote_average = movie['vote_average']
-    vote_formatted = str(vote_average)[0:3]
+    vote_formatted = f"{vote_average:.1f}"
     
     return {
             'title': title,
@@ -36,7 +36,7 @@ def get_tv(tv_list:list, index:int):
     overview = show['overview']
     first_air_date = show['first_air_date']
     vote_average = show['vote_average']
-    vote_formatted = str(vote_average)[0:3]
+    vote_formatted = f"{vote_average:.1f}"
     
     return {
             'name': name,
@@ -110,10 +110,17 @@ def run_tv_search(api:str, url:str):
 
 def main(api:str, mov_url:str, tv_url:str):
     subprocess.call('clear')
-    x = input('1 - Movie Search | 2 - TV Show Search ')
-    if (x == '1'):
+    choice = input("""
+    ======================
+          tMDB Search
+    ======================
+    [1] - Search a Movie
+    [2] - Search a TV Show
+    Press anything else for quit...
+    >>>  """)
+    if (choice == '1'):
         result = run_movie_search(api=api, url=mov_url)
-    elif (x == '2'):
+    elif (choice == '2'):
         result = run_tv_search(api=api, url=tv_url)
     else:
         return 'exit'
