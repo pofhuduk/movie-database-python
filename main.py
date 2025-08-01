@@ -49,12 +49,13 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
         return "No results found."
     else:
         text = ''
-        if (media_type == 'movie'):
-            for index,obj in enumerate(results[0:10]):
-                text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
-        else:
-             for index,obj in enumerate(results[0:10]):
-                text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
+        match media_type:
+            case 'movie':
+                for index,obj in enumerate(results[0:10]):
+                    text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+            case 'tv':
+                 for index,obj in enumerate(results[0:10]):
+                    text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
         text += '[0] Exit\n'
         choice = input(text + 'Choose: ')
         
