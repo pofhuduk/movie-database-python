@@ -62,7 +62,7 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
             return 'exit'
         index = int(choice) - 1
     try:    
-        movie_data = get_info(media_list=results, index=index, media_type=media_type)
+        media_data = get_info(media_list=results, index=index, media_type=media_type)
     except ValueError as e:
         print(e)
         exit()
@@ -70,11 +70,11 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
         =========================
                MOVIE SEARCH
         =========================
-        Movie Name: {movie_data['title']}
-        Release Date: {movie_data['release_date']}
-        iMDB: {movie_data['average_vote']}
+        Movie/Show Name: {media_data['title']}
+        Release Date: {media_data['release_date']}
+        Average Vote: {media_data['average_vote']}
         Overview:
-        {movie_data['overview']}''')
+        {media_data['overview']}''')
 
 def main(api:str, mov_url:str, tv_url:str):
     subprocess.call('clear')
