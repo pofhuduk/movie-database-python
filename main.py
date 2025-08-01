@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 import subprocess
 from typing import Literal
 
-def search(url:str, api:str, name:str):
+def search(url:str, api:str, name:str, media_type:Literal['movie','tv']):
+    url += media_type
     params = {
             'query': name,
             'api_key': api
@@ -54,7 +55,7 @@ def list_results(search_results: list, media_type: Literal['movie','tv']):
 
 def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
     name = input('Movie - TV Show Name:')    
-    results = search(url=url, name=name, api=api)
+    results = search(url=url, name=name, api=api, media_type=media_type)
     
     if (len(results) == 0):
         return 'No results found.'
@@ -78,27 +79,35 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
         Overview:
         {data['overview']}''')
 
-def get_popular(media_type: Literal['movie','tv']):
-    pass
-
-def main(api:str, mov_url:str, tv_url:str):
+def get_popular(api:str, url:str, media_type: Literal['movie','tv']):
+    url += media_type
+    r = requests.get(url, params={'api_key':api}).json()
+    result_list = r['results']
+    return list_results(search_results=result_list, media_type=media_type)
+    
+def main(api:str, search_url:str, pop_url:str):
     subprocess.call('clear')
-    choice = input("""
+    popular_movies = get_popular(url=pop_url, media_type='movie', api=api)
+    popular_shows = get_popular(url=pop_url, media_type='tv', api=api)
+
+    choice = input(f"""
     ======================
           tMDB Search
     ======================
     POPULAR MOVIES:
+    {popular_movies}
     ======================
     POPULAR TV SHOWS:
+    {popular_shows}
     ======================
     [1] - Search a Movie
     [2] - Search a TV Show
     Press anything else for quit...
     >>>  """)
     if (choice == '1'):
-        result = run_search(api=api, url=mov_url, media_type='movie')
+        result = run_search(api=api, url=search_url, media_type='movie')
     elif (choice == '2'):
-        result = run_search(api=api, url=tv_url, media_type='tv')
+        result = run_search(api=api, url=search_url, media_type='tv')
     else:
         return 'exit'
     return result
@@ -110,12 +119,12 @@ if not API:
     print('No API keys found.')
     exit()
 
-MOVIE_URL = 'https://api.themoviedb.org/3/search/movie'
-TV_URL = 'https://api.themoviedb.org/3/search/tv'
+SEARCH_URL = 'https://api.themoviedb.org/3/search/'
+POP_URL = 'https://api.themoviedb.org/3/discover/'
 
 while True:
     try:
-        result = main(api=API, mov_url=MOVIE_URL, tv_url=TV_URL)
+        result = main(api=API, search_url=SEARCH_URL, pop_url=POP_URL)
         if (result == 'exit'):
             print('Goodbye!')
             break
