@@ -39,14 +39,14 @@ def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
             'average_vote': vote_formatted
             }
 
-def list_results(search_results: list, media_type: Literal['movie','tv']):
+def list_results(search_results: list, max_results:int, media_type: Literal['movie','tv']):
     text = ''
     match media_type:
         case 'movie':
-            for index,obj in enumerate(search_results[0:10]):
+            for index,obj in enumerate(search_results[0:max_results]):
                 text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
         case 'tv':
-            for index,obj in enumerate(search_results[0:10]):
+            for index,obj in enumerate(search_results[0:max_results]):
                 text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
         case _:
             raise ValueError(f'Wrong media_type: "{media_type}" ! '
@@ -62,7 +62,7 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
     elif (len(results) == 1):
         index = 0
     else:
-        formatted_results = list_results(search_results=results, media_type=media_type)
+        formatted_results = list_results(search_results=results, max_results=10, media_type=media_type)
         print(formatted_results, end='')
         choice = int(input('[0] Exit\n Choose: '))
         if (choice == 0):
@@ -83,7 +83,7 @@ def get_popular(api:str, url:str, media_type: Literal['movie','tv']):
     url += media_type
     r = requests.get(url, params={'api_key':api}).json()
     result_list = r['results']
-    return list_results(search_results=result_list, media_type=media_type)
+    return list_results(search_results=result_list, max_results=5, media_type=media_type)
     
 def main(api:str, search_url:str, pop_url:str):
     subprocess.call('clear')
