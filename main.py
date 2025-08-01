@@ -10,8 +10,7 @@ def search(url:str, api:str, name:str):
             'api_key': api
             }
     r = requests.get(url, params=params).json()
-    results = r['results']
-    
+    results = r['results'] 
     return results
 
 def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
@@ -39,16 +38,18 @@ def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
             'average_vote': vote_formatted
             }
 
-def list_results(search_list: list, media_type: Literal['movie','tv']):
+def list_results(search_results: list, media_type: Literal['movie','tv']):
     text = ''
     match media_type:
         case 'movie':
-            for index,obj in enumerate(search_list[0:10]):
+            for index,obj in enumerate(search_results[0:10]):
                 text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
         case 'tv':
-            for index,obj in enumerate(search_list[0:10]):
+            for index,obj in enumerate(search_results[0:10]):
                 text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
-    text += '[0] Exit\n Choose: '
+        case _:
+            raise ValueError(f'Wrong media_type: "{media_type}" ! '
+            'You can only choose "movie" or "tv".')     
     return text
 
 def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
@@ -60,9 +61,9 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
     elif (len(results) == 1):
         index = 0
     else:
-        formatted_results = list_results(search_list=results, media_type=media_type)
-        print(formatted_results)
-        choice = int(input())
+        formatted_results = list_results(search_results=results, media_type=media_type)
+        print(formatted_results, end='')
+        choice = int(input('[0] Exit\n Choose: '))
         if (choice == 0):
             return 'exit'
         index = choice - 1
@@ -100,7 +101,6 @@ def main(api:str, mov_url:str, tv_url:str):
         result = run_search(api=api, url=tv_url, media_type='tv')
     else:
         return 'exit'
-
     return result
 
 load_dotenv()
