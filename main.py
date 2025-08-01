@@ -28,7 +28,6 @@ def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
             raise ValueError(f'Wrong media_type: "{media_type}" ! '
             'You can only choose "movie" or "tv".') 
          
-
     overview = media['overview']
     vote_average = media['vote_average']
     vote_formatted = f"{vote_average:.1f}"
@@ -40,9 +39,9 @@ def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
             'average_vote': vote_formatted
             }
 
-def run_movie_search(api:str, url:str):
-    movie_name = input('Movie Name:')    
-    results = search(url=url, name=movie_name, api=api)
+def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
+    name = input('Movie - TV Show Name:')    
+    results = search(url=url, name=name, api=api)
 
     if (len(results) == 1):
         index = 0
@@ -50,8 +49,12 @@ def run_movie_search(api:str, url:str):
         return "No results found."
     else:
         text = ''
-        for index,obj in enumerate(results[0:10]):
-            text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+        if (media_type == 'movie'):
+            for index,obj in enumerate(results[0:10]):
+                text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+        else:
+             for index,obj in enumerate(results[0:10]):
+                text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
         text += '[0] Exit\n'
         choice = input(text + 'Choose: ')
         
@@ -59,7 +62,7 @@ def run_movie_search(api:str, url:str):
             return 'exit'
         index = int(choice) - 1
     try:    
-        movie_data = get_info(media_list=results, index=index, media_type='movie')
+        movie_data = get_info(media_list=results, index=index, media_type=media_type)
     except ValueError as e:
         print(e)
         exit()
@@ -73,38 +76,6 @@ def run_movie_search(api:str, url:str):
         Overview:
         {movie_data['overview']}''')
 
-
-def run_tv_search(api:str, url:str):
-    tv_name = input('Show Name:')
-    results = search(url=url, name=tv_name, api=api)
-
-    if (len(results) == 1):
-        index = 0
-    elif (len(results) == 0):
-        return "No results found."
-    else:
-        text = ''
-        for index,obj in enumerate(results[0:10]):
-            text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
-        text += '[0] Exit\n'
-        choice = input(text + 'Choose:')
-        
-        if (choice == '0'):
-            return 'exit'
-        index = int(choice) - 1
-        
-    tv_data = get_info(media_list=results, index=index, media_type='tv')
-
-    return (f'''
-        =========================
-                SHOW SEARCH
-        =========================
-        Movie Name: {tv_data['title']}
-        Release Date: {tv_data['release_date']}
-        iMDB: {tv_data['average_vote']}
-        Overview:
-        {tv_data['overview']}''')
-
 def main(api:str, mov_url:str, tv_url:str):
     subprocess.call('clear')
     choice = input("""
@@ -116,9 +87,9 @@ def main(api:str, mov_url:str, tv_url:str):
     Press anything else for quit...
     >>>  """)
     if (choice == '1'):
-        result = run_movie_search(api=api, url=mov_url)
+        result = run_search(api=api, url=mov_url, media_type='movie')
     elif (choice == '2'):
-        result = run_tv_search(api=api, url=tv_url)
+        result = run_search(api=api, url=tv_url, media_type='tv')
     else:
         return 'exit'
 
