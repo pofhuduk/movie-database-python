@@ -70,14 +70,14 @@ def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
         index = choice - 1
     data = get_info(media_list=results, media_type=media_type, index=index)
     return (f'''
-        =========================
-               MOVIE SEARCH
-        =========================
-        Movie Name: {data['title']}
-        Release Date: {data['release_date']}
-        iMDB: {data['average_vote']}
-        Overview:
-        {data['overview']}''')
+{'='*15}
+{'MOVIE SEARCH':^20}
+{'='*15}
+Movie Name: {data['title']}
+Release Date: {data['release_date']}
+iMDB: {data['average_vote']}
+Overview:
+{data['overview']}''')
 
 def get_popular(api:str, url:str, media_type: Literal['movie','tv']):
     url += media_type
@@ -91,25 +91,26 @@ def main(api:str, search_url:str, pop_url:str):
     popular_shows = get_popular(url=pop_url, media_type='tv', api=api)
 
     choice = input(f"""
-    ======================
-          tMDB Search
-    ======================
-    POPULAR MOVIES:
-    {popular_movies}
-    ======================
-    POPULAR TV SHOWS:
-    {popular_shows}
-    ======================
-    [1] - Search a Movie
-    [2] - Search a TV Show
-    Press anything else for quit...
-    >>>  """)
-    if (choice == '1'):
-        result = run_search(api=api, url=search_url, media_type='movie')
-    elif (choice == '2'):
-        result = run_search(api=api, url=search_url, media_type='tv')
-    else:
-        return 'exit'
+======================
+tMDB Search
+======================
+POPULAR MOVIES:
+{popular_movies}
+======================
+POPULAR TV SHOWS:
+{popular_shows}
+======================
+[1] - Search a Movie
+[2] - Search a TV Show
+Press anything else for quit...
+>>>  """)
+    match choice:
+        case '1':
+            result = run_search(api=api, url=search_url, media_type='movie')
+        case '2':
+            result = run_search(api=api, url=search_url, media_type='tv')
+        case _:
+            return 'exit'
     return result
 
 load_dotenv()
