@@ -39,49 +39,56 @@ def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
             'average_vote': vote_formatted
             }
 
+def list_results(search_list: list, media_type: Literal['movie','tv']):
+    text = ''
+    match media_type:
+        case 'movie':
+            for index,obj in enumerate(search_list[0:10]):
+                text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
+        case 'tv':
+            for index,obj in enumerate(search_list[0:10]):
+                text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
+    text += '[0] Exit\n Choose: '
+    return text
+
 def run_search(api:str, url:str, media_type: Literal['movie', 'tv']):
     name = input('Movie - TV Show Name:')    
     results = search(url=url, name=name, api=api)
-
-    if (len(results) == 1):
+    
+    if (len(results) == 0):
+        return 'No results found.'
+    elif (len(results) == 1):
         index = 0
-    elif (len(results) == 0):
-        return "No results found."
     else:
-        text = ''
-        match media_type:
-            case 'movie':
-                for index,obj in enumerate(results[0:10]):
-                    text += f'[{index + 1}] '+ obj['title'] + ' | ' + obj['release_date'] + '\n'
-            case 'tv':
-                 for index,obj in enumerate(results[0:10]):
-                    text += f'[{index + 1}] '+ obj['name'] + ' | ' + obj['first_air_date'] + '\n'
-        text += '[0] Exit\n'
-        choice = input(text + 'Choose: ')
-        
-        if (choice == '0'):
+        formatted_results = list_results(search_list=results, media_type=media_type)
+        print(formatted_results)
+        choice = int(input())
+        if (choice == 0):
             return 'exit'
-        index = int(choice) - 1
-    try:    
-        media_data = get_info(media_list=results, index=index, media_type=media_type)
-    except ValueError as e:
-        print(e)
-        exit()
+        index = choice - 1
+    data = get_info(media_list=results, media_type=media_type, index=index)
     return (f'''
         =========================
                MOVIE SEARCH
         =========================
-        Movie/Show Name: {media_data['title']}
-        Release Date: {media_data['release_date']}
-        Average Vote: {media_data['average_vote']}
+        Movie Name: {data['title']}
+        Release Date: {data['release_date']}
+        iMDB: {data['average_vote']}
         Overview:
-        {media_data['overview']}''')
+        {data['overview']}''')
+
+def get_popular(media_type: Literal['movie','tv']):
+    pass
 
 def main(api:str, mov_url:str, tv_url:str):
     subprocess.call('clear')
     choice = input("""
     ======================
           tMDB Search
+    ======================
+    POPULAR MOVIES:
+    ======================
+    POPULAR TV SHOWS:
     ======================
     [1] - Search a Movie
     [2] - Search a TV Show
