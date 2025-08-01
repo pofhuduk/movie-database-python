@@ -2,6 +2,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import subprocess
+from typing import Literal
 
 def search(url:str, api:str, name:str):
     params = {
@@ -13,35 +14,29 @@ def search(url:str, api:str, name:str):
     
     return results
 
-def get_movie(movie_list:list, index:int):
-    movie = movie_list[index]
+def get_info(media_list:list, index:int, media_type: Literal['movie' , 'tv']):
+    media = media_list[index]
+    
+    match media_type:
+        case 'movie':
+            title = media['title']
+            release_date = media['release_date']
+        case 'tv':
+            title = media['name']
+            release_date = media['first_air_date']
+        case _:
+            raise ValueError(f'Wrong media_type: "{media_type}" ! '
+            'You can only choose "movie" or "tv".') 
+         
 
-    title = movie['title']
-    overview = movie['overview']
-    release_date = movie['release_date']
-    vote_average = movie['vote_average']
+    overview = media['overview']
+    vote_average = media['vote_average']
     vote_formatted = f"{vote_average:.1f}"
     
     return {
             'title': title,
             'overview': overview,
             'release_date': release_date,
-            'average_vote': vote_formatted
-            }
-
-def get_tv(tv_list:list, index:int):
-    show = tv_list[index]
-
-    name = show['name']
-    overview = show['overview']
-    first_air_date = show['first_air_date']
-    vote_average = show['vote_average']
-    vote_formatted = f"{vote_average:.1f}"
-    
-    return {
-            'name': name,
-            'overview': overview,
-            'first_air_date': first_air_date,
             'average_vote': vote_formatted
             }
 
@@ -63,9 +58,11 @@ def run_movie_search(api:str, url:str):
         if (choice == '0'):
             return 'exit'
         index = int(choice) - 1
-        
-    movie_data = get_movie(movie_list=results, index=index)
-
+    try:    
+        movie_data = get_info(media_list=results, index=index, media_type='movie')
+    except ValueError as e:
+        print(e)
+        exit()
     return (f'''
         =========================
                MOVIE SEARCH
@@ -96,14 +93,14 @@ def run_tv_search(api:str, url:str):
             return 'exit'
         index = int(choice) - 1
         
-    tv_data = get_tv(tv_list=results, index=index)
+    tv_data = get_info(media_list=results, index=index, media_type='tv')
 
     return (f'''
         =========================
                 SHOW SEARCH
         =========================
-        Movie Name: {tv_data['name']}
-        Release Date: {tv_data['first_air_date']}
+        Movie Name: {tv_data['title']}
+        Release Date: {tv_data['release_date']}
         iMDB: {tv_data['average_vote']}
         Overview:
         {tv_data['overview']}''')
